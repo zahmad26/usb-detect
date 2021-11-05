@@ -1,7 +1,11 @@
 const usbDetect = require("usb-detection");
 const express = require("express");
+const cors = require("cors");
+
 const app = express();
 app.use(express.json());
+
+app.use(cors());
 
 usbDetect.startMonitoring();
 
@@ -14,6 +18,20 @@ app.get("/devices", (req, res) => {
     .catch((err) => {
       console.log(err);
     });
+});
+
+app.get("/add", (req, res) => {
+  // Detect add/insert
+  usbDetect.on("add", (device) => {
+    res.send(device);
+  });
+});
+
+app.get("/remove", (req, res) => {
+  // Detect remove
+  usbDetect.on("remove", (device) => {
+    res.send(device);
+  });
 });
 
 // Detect add/insert
@@ -39,7 +57,9 @@ usbDetect.on("remove:vid:pid", function (device) {
 });
 
 // Detect add or remove (change)
-usbDetect.on('change', function(device) { console.log('change', device); });
+usbDetect.on("change", function (device) {
+  console.log("change", device);
+});
 // usbDetect.on('change:vid', function(device) { console.log('change', device); });
 // usbDetect.on('change:vid:pid', function(device) { console.log('change', device); });
 
